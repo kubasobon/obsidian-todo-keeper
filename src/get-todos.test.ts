@@ -1,7 +1,7 @@
-import { expect, test } from "vitest";
 import { getTodos } from "./get-todos";
 
-test("single todo element should return itself", () => {
+describe("getTodos", () => {
+  test("single todo element should return itself", () => {
   // GIVEN
   const lines = ["- [ ] tada"];
 
@@ -33,7 +33,7 @@ test("single done todo element should not return itself", () => {
   const result = getTodos({ lines });
 
   // THEN
-  const todos = [];
+  const todos: string[] = [];
   expect(result).toStrictEqual(todos);
 });
 
@@ -45,7 +45,7 @@ test("single canceled todo element should not return itself", () => {
   const result = getTodos({ lines });
 
   // THEN
-  const todos = [];
+  const todos: string[] = [];
   expect(result).toStrictEqual(todos);
 });
 
@@ -534,4 +534,6 @@ test("should not match malformed todos", () => {
   ];
   const todos = getTodos({ lines });
   expect(todos).toStrictEqual(["- [ ] valid todo"]);
+  });
 });
+
