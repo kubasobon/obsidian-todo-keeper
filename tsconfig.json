@@ -10,9 +10,8 @@
     "moduleResolution": "node",
     "importHelpers": true,
     "isolatedModules": true,
-    "lib": ["DOM", "ES5", "ES6", "ES7"],
+    "lib": ["DOM", "ES5", "ES6", "ES7", "ES2022.Intl"],
     "strict": true,
-    "sourceMap": true,
     "skipLibCheck": true
   },
   "include": ["**/*.ts"]

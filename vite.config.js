@@ -9,7 +9,7 @@ export default defineConfig({
     minify: true,
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, 'src/index.js'),
+      entry: resolve(__dirname, 'src/index.ts'),
       name: 'ObsidianTodoKeeper',
       fileName: () => 'main.js',
       formats: ['cjs'],

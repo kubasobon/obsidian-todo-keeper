@@ -1,13 +1,16 @@
-import { Setting, PluginSettingTab } from "obsidian";
+import { App, PluginSettingTab, Setting, TFile } from "obsidian";
 import { getDailyNoteSettings } from "obsidian-daily-notes-interface";
+import type RolloverTodosPlugin from "../index";
 
 export default class RolloverSettingTab extends PluginSettingTab {
-  constructor(app, plugin) {
+  plugin: RolloverTodosPlugin;
+
+  constructor(app: App, plugin: RolloverTodosPlugin) {
     super(app, plugin);
     this.plugin = plugin;
   }
 
-  async getTemplateHeadings() {
+  async getTemplateHeadings(): Promise<string[]> {
     const { template } = getDailyNoteSettings();
     if (!template) return [];
 
@@ -17,8 +20,7 @@ export default class RolloverSettingTab extends PluginSettingTab {
       file = this.app.vault.getAbstractFileByPath(template + ".md");
     }
 
-    if (file === null) {
-      // file not available, no template-heading can be returned
+    if (!(file instanceof TFile)) {
       return [];
     }
 
@@ -39,7 +41,7 @@ export default class RolloverSettingTab extends PluginSettingTab {
       .addDropdown((dropdown) =>
         dropdown
           .addOptions({
-            ...templateHeadings.reduce((acc, heading) => {
+            ...templateHeadings.reduce<Record<string, string>>((acc, heading) => {
               acc[heading] = heading;
               return acc;
             }, {}),
@@ -101,18 +103,10 @@ export default class RolloverSettingTab extends PluginSettingTab {
       )
       .addToggle((toggle) =>
         toggle
-          // Default to true if the setting is not set
-          .setValue(
-            this.plugin.settings.rolloverOnFileCreate === undefined ||
-              this.plugin.settings.rolloverOnFileCreate === null
-              ? true
-              : this.plugin.settings.rolloverOnFileCreate
-          )
+          .setValue(this.plugin.settings.rolloverOnFileCreate ?? true)
           .onChange((value) => {
-            console.log(value);
             this.plugin.settings.rolloverOnFileCreate = value;
             this.plugin.saveSettings();
-            this.plugin.loadData().then((value) => console.log(value));
           })
       );
 
@@ -129,18 +123,15 @@ export default class RolloverSettingTab extends PluginSettingTab {
             this.plugin.saveSettings();
           })
       );
+
     new Setting(this.containerEl)
       .setName("Add extra blank line between Heading and Todos")
-      .setDesc(`Whether to add an extra blank line between the selected Heading and the rolled over todos. This will only work in combination with a configured Template Heading.`)
-      .addToggle((toggle) => 
+      .setDesc(
+        `Whether to add an extra blank line between the selected Heading and the rolled over todos. This will only work in combination with a configured Template Heading.`
+      )
+      .addToggle((toggle) =>
         toggle
-          .setValue(
-            this.plugin.settings
-              .leadingNewLine === undefined || 
-              this.plugin.settings.leadingNewLine === null 
-              ? true 
-              : this.plugin.settings.leadingNewLine
-          )
+          .setValue(this.plugin.settings.leadingNewLine ?? true)
           .onChange((value) => {
             this.plugin.settings.leadingNewLine = value;
             this.plugin.saveSettings();
@@ -148,3 +139,4 @@ export default class RolloverSettingTab extends PluginSettingTab {
       );
   }
 }
+
