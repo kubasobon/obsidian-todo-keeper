@@ -59,9 +59,11 @@ export function extractHeadingSection(
 
 /**
  * Returns section lines with complete todos removed — but only when ALL of
- * their child todo lines are also complete. Incomplete todos, non-todo lines
- * (headings, prose), and complete todos that have at least one incomplete child
- * are all preserved.
+ * their child todo lines are also complete. Rules:
+ * - Incomplete parent: kept with ALL its children as-is (no re-evaluation of children)
+ * - Complete parent with any incomplete child: kept with ALL its children as-is
+ * - Complete parent with no incomplete children: removed along with all children
+ * - Non-todo lines (headings, prose): always kept
  */
 export function removeCompletedTodosFromSection(
   lines: string[],
@@ -70,24 +72,37 @@ export function removeCompletedTodosFromSection(
   const result: string[] = [];
   let i = 0;
   while (i < lines.length) {
-    if (isCompleteTodo(lines[i], doneMarkers)) {
+    const line = lines[i];
+    if (isIncompleteTodo(line, doneMarkers)) {
+      // Incomplete parent: keep it and ALL its children without re-evaluating them
+      const children = getChildLines(lines, i);
+      result.push(line, ...children);
+      i += 1 + children.length;
+    } else if (isCompleteTodo(line, doneMarkers)) {
       const children = getChildLines(lines, i);
       const hasIncompleteChild = children.some((c) => isIncompleteTodo(c, doneMarkers));
-      if (!hasIncompleteChild) {
-        // All children are done (or there are none) — drop the whole block
+      if (hasIncompleteChild) {
+        // Complete parent with incomplete children: keep the whole block as-is
+        result.push(line, ...children);
         i += 1 + children.length;
-        continue;
+      } else {
+        // Fully done: drop this todo and all its children
+        i += 1 + children.length;
       }
+    } else {
+      result.push(line);
+      i++;
     }
-    result.push(lines[i]);
-    i++;
   }
   return result;
 }
 
 /**
- * Returns section lines with incomplete todos (and all their children) removed.
- * Complete todos, headings, and other non-todo lines are always kept.
+ * Returns section lines with incomplete todos removed from yesterday's note.
+ * When an incomplete todo has complete children (done work worth recording),
+ * the parent is kept as structural context alongside those complete children.
+ * Incomplete children are removed recursively. A standalone incomplete todo
+ * with no complete children anywhere in its subtree is dropped entirely.
  */
 export function removeIncompleteTodosFromSection(
   lines: string[],
@@ -96,14 +111,20 @@ export function removeIncompleteTodosFromSection(
   const result: string[] = [];
   let i = 0;
   while (i < lines.length) {
-    if (isIncompleteTodo(lines[i], doneMarkers)) {
+    const line = lines[i];
+    if (isIncompleteTodo(line, doneMarkers)) {
       const children = getChildLines(lines, i);
-      // Drop this incomplete todo and all its children
+      const keptChildren = removeIncompleteTodosFromSection(children, doneMarkers);
+      if (keptChildren.length > 0) {
+        // Keep the parent as structural context for its complete children
+        result.push(line, ...keptChildren);
+      }
+      // If nothing survived from the subtree, drop the parent entirely
       i += 1 + children.length;
-      continue;
+    } else {
+      result.push(line);
+      i++;
     }
-    result.push(lines[i]);
-    i++;
   }
   return result;
 }

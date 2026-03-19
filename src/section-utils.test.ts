@@ -113,11 +113,12 @@ describe("removeCompletedTodosFromSection", () => {
     expect(removeCompletedTodosFromSection(lines, DONE)).toEqual([]);
   });
 
-  it("keeps complete todos that have at least one incomplete child; removes done children with no further incomplete children", () => {
+  it("keeps complete todos that have at least one incomplete child, with ALL their children", () => {
+    // Complete parent has a done child AND an incomplete child → keep everything
     const lines = ["- [x] parent", "  - [x] done child", "  - [ ] not done child"];
-    // Parent kept (has incomplete child). Done child removed (no incomplete sub-children).
     expect(removeCompletedTodosFromSection(lines, DONE)).toEqual([
       "- [x] parent",
+      "  - [x] done child",
       "  - [ ] not done child",
     ]);
   });
@@ -127,11 +128,28 @@ describe("removeCompletedTodosFromSection", () => {
     expect(removeCompletedTodosFromSection(lines, DONE)).toEqual(["### Work", "some note"]);
   });
 
-  it("removes complete child todos that have no incomplete sub-children", () => {
-    // Parent incomplete → keep; done child with no incomplete grandchildren → remove
+  it("keeps ALL children of an incomplete parent, including done ones", () => {
     const lines = ["- [ ] parent", "  - [x] done child"];
     expect(removeCompletedTodosFromSection(lines, DONE)).toEqual([
       "- [ ] parent",
+      "  - [x] done child",
+    ]);
+  });
+
+  it("3-level nesting: incomplete root keeps the entire subtree as-is", () => {
+    // A(incomplete) → B(incomplete) → C(incomplete), D(done)
+    // Root is incomplete → everything moves to today unchanged
+    const lines = [
+      "- [ ] A",
+      "  - [ ] B",
+      "    - [ ] C",
+      "    - [x] D",
+    ];
+    expect(removeCompletedTodosFromSection(lines, DONE)).toEqual([
+      "- [ ] A",
+      "  - [ ] B",
+      "    - [ ] C",
+      "    - [x] D",
     ]);
   });
 });
@@ -139,9 +157,22 @@ describe("removeCompletedTodosFromSection", () => {
 // ─── removeIncompleteTodosFromSection ────────────────────────────────────────
 
 describe("removeIncompleteTodosFromSection", () => {
-  it("removes incomplete todos and their children", () => {
-    const lines = ["- [ ] todo", "  - [ ] child", "  - [x] done child"];
+  it("removes an incomplete todo with no children", () => {
+    const lines = ["- [ ] todo"];
     expect(removeIncompleteTodosFromSection(lines, DONE)).toEqual([]);
+  });
+
+  it("removes incomplete children of an incomplete parent", () => {
+    const lines = ["- [ ] todo", "  - [ ] child"];
+    expect(removeIncompleteTodosFromSection(lines, DONE)).toEqual([]);
+  });
+
+  it("keeps complete children of an incomplete parent as a record, with the parent for context", () => {
+    const lines = ["- [ ] todo", "  - [ ] child", "  - [x] done child"];
+    expect(removeIncompleteTodosFromSection(lines, DONE)).toEqual([
+      "- [ ] todo",
+      "  - [x] done child",
+    ]);
   });
 
   it("keeps complete todos", () => {
@@ -162,9 +193,29 @@ describe("removeIncompleteTodosFromSection", () => {
     ]);
   });
 
-  it("removes an incomplete parent with a complete child", () => {
+  it("removes an incomplete parent with a complete child — keeps both parent and done child", () => {
     const lines = ["- [ ] parent", "  - [x] done child"];
-    expect(removeIncompleteTodosFromSection(lines, DONE)).toEqual([]);
+    expect(removeIncompleteTodosFromSection(lines, DONE)).toEqual([
+      "- [ ] parent",
+      "  - [x] done child",
+    ]);
+  });
+
+  it("3-level nesting: preserves the full ancestor chain down to a completed leaf", () => {
+    // A(incomplete) → B(incomplete) → C(incomplete), D(done)
+    // C has no done descendants → dropped entirely
+    // D is done → kept; B is kept as context for D; A is kept as context for B
+    const lines = [
+      "- [ ] A",
+      "  - [ ] B",
+      "    - [ ] C",
+      "    - [x] D",
+    ];
+    expect(removeIncompleteTodosFromSection(lines, DONE)).toEqual([
+      "- [ ] A",
+      "  - [ ] B",
+      "    - [x] D",
+    ]);
   });
 });
 
