@@ -3,7 +3,7 @@
     "name": "TODO Keeper",
     "version": "0.0.1",
     "minAppVersion": "0.12.12",
-    "description": "Reimplementation of obsidian-rollover-daily-todos Obsidian.md plugin (by Lukas Mölschl) according to personal taste",
+    "description": "Keeps incomplete todos from your previous daily note into today's",
     "author": "Kuba Soboń",
     "authorUrl": "https://kubasobon.com",
     "isDesktopOnly": false

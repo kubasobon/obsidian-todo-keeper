@@ -14,7 +14,7 @@ class TodoParser {
   // List of strings that include the Markdown content
   private lines: string[];
 
-  // Boolean that encodes whether nested items should be rolled over
+  // Boolean that encodes whether nested items should be kept
   private withChildren: boolean;
 
   // Parse content with segmentation to allow for Unicode grapheme clusters

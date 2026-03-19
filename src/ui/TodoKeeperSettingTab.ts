@@ -1,11 +1,11 @@
 import { App, PluginSettingTab, Setting, TFile } from "obsidian";
 import { getDailyNoteSettings } from "obsidian-daily-notes-interface";
-import type RolloverTodosPlugin from "../index";
+import type TodoKeeperPlugin from "../index";
 
-export default class RolloverSettingTab extends PluginSettingTab {
-  plugin: RolloverTodosPlugin;
+export default class TodoKeeperSettingTab extends PluginSettingTab {
+  plugin: TodoKeeperPlugin;
 
-  constructor(app: App, plugin: RolloverTodosPlugin) {
+  constructor(app: App, plugin: TodoKeeperPlugin) {
     super(app, plugin);
     this.plugin = plugin;
   }
@@ -69,10 +69,8 @@ export default class RolloverSettingTab extends PluginSettingTab {
       );
 
     new Setting(this.containerEl)
-      .setName("Remove empty todos in rollover")
-      .setDesc(
-        `If you have empty todos, they will not be rolled over to the next day.`
-      )
+      .setName("Remove empty todos when keeping")
+      .setDesc(`If you have empty todos, they will not be kept in the next day's note.`)
       .addToggle((toggle) =>
         toggle
           .setValue(this.plugin.settings.removeEmptyTodos || false)
@@ -83,29 +81,27 @@ export default class RolloverSettingTab extends PluginSettingTab {
       );
 
     new Setting(this.containerEl)
-      .setName("Roll over children of todos")
+      .setName("Keep children of todos")
       .setDesc(
-        `By default, only the actual todos are rolled over. If you add nested Markdown-elements beneath your todos, these are not rolled over but stay in place, possibly altering the logic of your previous note. This setting allows for also migrating the nested elements.`
+        `By default, only the actual todos are kept. If you add nested Markdown-elements beneath your todos, these are not kept but stay in place, possibly altering the logic of your previous note. This setting allows for also migrating the nested elements.`
       )
       .addToggle((toggle) =>
         toggle
-          .setValue(this.plugin.settings.rolloverChildren || false)
+          .setValue(this.plugin.settings.keepChildren || false)
           .onChange((value) => {
-            this.plugin.settings.rolloverChildren = value;
+            this.plugin.settings.keepChildren = value;
             this.plugin.saveSettings();
           })
       );
 
     new Setting(this.containerEl)
-      .setName("Automatic rollover on daily note open")
-      .setDesc(
-        `If enabled, the plugin will automatically rollover todos when you open a daily note.`
-      )
+      .setName("Automatically keep todos on daily note open")
+      .setDesc(`If enabled, the plugin will automatically keep todos when you open a daily note.`)
       .addToggle((toggle) =>
         toggle
-          .setValue(this.plugin.settings.rolloverOnFileCreate ?? true)
+          .setValue(this.plugin.settings.keepOnFileCreate ?? true)
           .onChange((value) => {
-            this.plugin.settings.rolloverOnFileCreate = value;
+            this.plugin.settings.keepOnFileCreate = value;
             this.plugin.saveSettings();
           })
       );
@@ -127,7 +123,7 @@ export default class RolloverSettingTab extends PluginSettingTab {
     new Setting(this.containerEl)
       .setName("Add extra blank line between Heading and Todos")
       .setDesc(
-        `Whether to add an extra blank line between the selected Heading and the rolled over todos. This will only work in combination with a configured Template Heading.`
+        `Whether to add an extra blank line between the selected Heading and the kept todos. This will only work in combination with a configured Template Heading.`
       )
       .addToggle((toggle) =>
         toggle
