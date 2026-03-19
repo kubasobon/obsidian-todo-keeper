@@ -91,3 +91,7 @@ And the previous day might look like
 ## Installation
 
 This plugin can be installed within the `Third-party Plugins` tab within Obsidian
+
+## Attribution
+
+Forked from [obsidian-rollover-daily-todos](https://github.com/lumoe/obsidian-rollover-daily-todos) by [lumoe](https://github.com/lumoe), licensed under MIT.

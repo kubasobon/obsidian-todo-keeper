@@ -1,8 +1,8 @@
 {
-    "id": "obsidian-todo-keeper",
+    "id": "todo-keeper",
     "name": "TODO Keeper",
     "version": "0.0.1",
-    "minAppVersion": "0.12.12",
+    "minAppVersion": "1.12.4",
     "description": "Keeps incomplete todos from your previous daily note into today's",
     "author": "Kuba Soboń",
     "authorUrl": "https://kubasobon.com",

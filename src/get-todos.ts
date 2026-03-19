@@ -7,14 +7,16 @@
 // grapheme cluster, so without this list they would pass the length === 1 check.
 export const INVALID_GRAPHEMES = ["\u202E", "\u200B", "\u200C", "\u200D"];
 
-// Splits text into Unicode grapheme clusters.
-// Falls back to Array.from() which handles surrogate pairs but not complex clusters.
+// Splits text into Unicode grapheme clusters using Intl.Segmenter.
+// Falls back to Array.from() on environments where Intl.Segmenter is unavailable.
+// The fallback correctly handles surrogate pairs but not multi-codepoint sequences
+// (e.g. ZWJ emoji). For the checkbox-content check this is an acceptable trade-off,
+// as done-status markers are always single ASCII characters in practice.
 export function toGraphemes(text: string): string[] {
   if (typeof Intl !== "undefined" && Intl.Segmenter) {
     const segmenter = new Intl.Segmenter("en", { granularity: "grapheme" });
     return Array.from(segmenter.segment(text), (s) => s.segment);
   }
-  console.error("Intl.Segmenter not available, falling back to Array.from()");
   return Array.from(text);
 }
 

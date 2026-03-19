@@ -1,4 +1,4 @@
-import { Notice, Plugin, TAbstractFile, TFile } from "obsidian";
+import { Notice, Plugin, TAbstractFile, TFile, normalizePath } from "obsidian";
 import {
   getDailyNoteSettings,
   getAllDailyNotes,
@@ -19,8 +19,7 @@ const MAX_TIME_SINCE_CREATION = 5000; // 5 seconds
 
 /** Strips leading/trailing slashes from a folder path. */
 function cleanFolder(folder: string | undefined): string {
-  if (!folder) return "";
-  return folder.replace(/^\/|\/$/g, "");
+  return normalizePath(folder ?? "");
 }
 
 /** Parses a daily note's date from its file path. */
@@ -102,57 +101,45 @@ export default class TodoKeeperPlugin extends Plugin {
       this.settings;
     const doneMarkers = parseDoneMarkers(doneStatusMarkers ?? "xX-");
 
-    // Extract the full heading section from yesterday's note
-    const yesterdayContent = await this.app.vault.read(yesterday);
-    const yesterdayLines = yesterdayContent.split("\n");
-    const section = extractHeadingSection(yesterdayLines, templateHeading);
+    // Atomically read (and optionally clean) yesterday's note.
+    // The section lines are captured from the callback for use below.
+    let sectionLines: string[] | null = null;
+    await this.app.vault.process(yesterday, (content) => {
+      const section = extractHeadingSection(content.split("\n"), templateHeading);
+      if (!section) return content;
+      sectionLines = section.sectionLines;
+      if (!deleteOnComplete) return content;
+      const cleaned = removeIncompleteTodosFromSection(sectionLines, doneMarkers);
+      return replaceHeadingSection(content, templateHeading, cleaned, false).content;
+    });
 
-    if (!section) {
+    if (!sectionLines) {
       if (templateHeading !== "none") {
-        new Notice(
-          `Todo Keeper: '${templateHeading}' not found in yesterday's note.`,
-          6000
-        );
+        new Notice(`Todo Keeper: '${templateHeading}' not found in yesterday's note.`, 6000);
       }
       return;
     }
 
-    // Build today's section: copy everything, then drop complete todos (all children complete)
-    let todaySectionLines = removeCompletedTodosFromSection(section.sectionLines, doneMarkers);
-
-    if (removeEmptyTodos) {
-      todaySectionLines = todaySectionLines.filter((l) => !isEmptyTodo(l));
-    }
-
-    // Write the cleaned section into today's note
-    const todayContent = await this.app.vault.read(file);
-    const { content: newTodayContent, headingFound } = replaceHeadingSection(
-      todayContent,
-      templateHeading,
-      todaySectionLines,
-      leadingNewLine
-    );
-    await this.app.vault.modify(file, newTodayContent);
-
-    console.log(`todo-keeper: section copied from ${yesterday.basename} to ${file.basename}`);
-
-    // Optionally clean yesterday: remove incomplete todos, keep completed ones as a record
-    if (deleteOnComplete) {
-      const yesterdaySectionLines = removeIncompleteTodosFromSection(
-        section.sectionLines,
-        doneMarkers
-      );
-      const { content: newYesterdayContent } = replaceHeadingSection(
-        yesterdayContent,
+    // Atomically write the cleaned section into today's note.
+    const captured: string[] = sectionLines;
+    let keptCount = 0;
+    let headingFound = true;
+    await this.app.vault.process(file, (content) => {
+      let todaySectionLines = removeCompletedTodosFromSection(captured, doneMarkers);
+      if (removeEmptyTodos) {
+        todaySectionLines = todaySectionLines.filter((l) => !isEmptyTodo(l));
+      }
+      keptCount = todaySectionLines.filter((l) => isIncompleteTodo(l, doneMarkers)).length;
+      const { content: newContent, headingFound: found } = replaceHeadingSection(
+        content,
         templateHeading,
-        yesterdaySectionLines,
-        false
+        todaySectionLines,
+        leadingNewLine
       );
-      await this.app.vault.modify(yesterday, newYesterdayContent);
-    }
+      headingFound = found;
+      return newContent;
+    });
 
-    // Count incomplete todos kept in today's section for the notice
-    const keptCount = todaySectionLines.filter((l) => isIncompleteTodo(l, doneMarkers)).length;
     const headingNotFoundMessage = !headingFound
       ? `Todo Keeper: '${templateHeading}' not found in today's note — todos appended to the end.`
       : null;
@@ -174,7 +161,7 @@ export default class TodoKeeperPlugin extends Plugin {
     );
 
     this.addCommand({
-      id: "obsidian-todo-keeper-keep",
+      id: "todo-keeper-keep",
       name: "Keep Todos Now",
       callback: () => this.keepTodos(),
     });
