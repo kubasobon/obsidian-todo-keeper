@@ -89,7 +89,7 @@ export default class TodoKeeperPlugin extends Plugin {
 
     if (!this.isDailyNotesEnabled()) {
       new Notice(
-        "Todo Keeper: unable to keep todos — please enable Daily Notes, or Periodic Notes (with daily notes enabled).",
+        "Todo Keeper: Daily Notes is not enabled. Enable the Daily Notes or Periodic Notes plugin to use this plugin.",
         10000
       );
       return;
@@ -110,7 +110,7 @@ export default class TodoKeeperPlugin extends Plugin {
     if (!section) {
       if (templateHeading !== "none") {
         new Notice(
-          `Todo Keeper: couldn't find '${templateHeading}' in yesterday's note.`,
+          `Todo Keeper: '${templateHeading}' not found in yesterday's note.`,
           6000
         );
       }
@@ -154,9 +154,9 @@ export default class TodoKeeperPlugin extends Plugin {
     // Count incomplete todos kept in today's section for the notice
     const keptCount = todaySectionLines.filter((l) => isIncompleteTodo(l, doneMarkers)).length;
     const headingNotFoundMessage = !headingFound
-      ? `Todo Keeper: couldn't find '${templateHeading}' in today's note. Appended to end of file.`
+      ? `Todo Keeper: '${templateHeading}' not found in today's note — todos appended to the end.`
       : null;
-    const notice = buildKeepNotice(keptCount, 0, headingNotFoundMessage);
+    const notice = buildKeepNotice(keptCount, headingNotFoundMessage);
     if (notice) new Notice(notice, 4000 + notice.length * 3);
   }
 

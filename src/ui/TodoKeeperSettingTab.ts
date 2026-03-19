@@ -37,7 +37,7 @@ export default class TodoKeeperSettingTab extends PluginSettingTab {
     this.containerEl.empty();
     new Setting(this.containerEl)
       .setName("Template heading")
-      .setDesc("Which heading from your template should the todos go under")
+      .setDesc("Heading in your daily note template where unfinished todos will be placed.")
       .addDropdown((dropdown) =>
         dropdown
           .addOptions({
@@ -55,9 +55,9 @@ export default class TodoKeeperSettingTab extends PluginSettingTab {
       );
 
     new Setting(this.containerEl)
-      .setName("Clean up previous day's note")
+      .setName("Clean up yesterday's note")
       .setDesc(
-        `After copying to today's note, remove incomplete todos (and their children) from yesterday's note. Complete todos stay in yesterday as a record of what was done. Destructive — back up your notes before enabling.`
+        `After copying to today, removes incomplete todos from yesterday's note. Completed todos remain as a record of what was done. ⚠️ Destructive — enable with caution.`
       )
       .addToggle((toggle) =>
         toggle
@@ -69,8 +69,8 @@ export default class TodoKeeperSettingTab extends PluginSettingTab {
       );
 
     new Setting(this.containerEl)
-      .setName("Remove empty todos when keeping")
-      .setDesc(`Empty checkboxes (- [ ]) will be dropped and not carried into today's note.`)
+      .setName("Skip empty checkboxes")
+      .setDesc("Empty checkboxes (- [ ]) will not be carried over to today's note.")
       .addToggle((toggle) =>
         toggle
           .setValue(this.plugin.settings.removeEmptyTodos || false)
@@ -81,8 +81,8 @@ export default class TodoKeeperSettingTab extends PluginSettingTab {
       );
 
     new Setting(this.containerEl)
-      .setName("Automatically keep todos on daily note open")
-      .setDesc(`If enabled, the plugin will automatically keep todos when you open a daily note.`)
+      .setName("Run automatically on daily note creation")
+      .setDesc("Automatically keeps todos when a new daily note is created.")
       .addToggle((toggle) =>
         toggle
           .setValue(this.plugin.settings.keepOnFileCreate ?? true)
@@ -93,9 +93,9 @@ export default class TodoKeeperSettingTab extends PluginSettingTab {
       );
 
     new Setting(this.containerEl)
-      .setName("Done status markers")
+      .setName("Completed task markers")
       .setDesc(
-        `Characters that represent done status in checkboxes. Default is "xX-". Add any characters that should be considered as marking a task complete.`
+        `Characters that mark a checkbox as done. Defaults to "xX-". Any character listed here is treated as complete.`
       )
       .addText((text) =>
         text
@@ -107,10 +107,8 @@ export default class TodoKeeperSettingTab extends PluginSettingTab {
       );
 
     new Setting(this.containerEl)
-      .setName("Add extra blank line between Heading and Todos")
-      .setDesc(
-        `Whether to add an extra blank line between the selected Heading and the kept todos. This will only work in combination with a configured Template Heading.`
-      )
+      .setName("Blank line after heading")
+      .setDesc("Insert a blank line between the template heading and the first todo.")
       .addToggle((toggle) =>
         toggle
           .setValue(this.plugin.settings.leadingNewLine ?? true)

@@ -11,17 +11,12 @@ export function isEmptyTodo(line: string): boolean {
  * Returns null if there is nothing to report.
  */
 export function buildKeepNotice(
-  todosAdded: number,
-  emptiesRemoved: number,
+  todosKept: number,
   headingNotFoundMessage: string | null
 ): string | null {
   const parts: string[] = [];
   if (headingNotFoundMessage) parts.push(headingNotFoundMessage);
-  if (todosAdded > 0)
-    parts.push(`- ${todosAdded} todo${todosAdded > 1 ? "s" : ""} kept.`);
-  if (emptiesRemoved > 0)
-    parts.push(
-      `- ${emptiesRemoved} empty todo${emptiesRemoved > 1 ? "s" : ""} removed.`
-    );
+  if (todosKept > 0)
+    parts.push(`Kept ${todosKept} incomplete todo${todosKept > 1 ? "s" : ""}.`);
   return parts.length > 0 ? parts.join("\n") : null;
 }
