@@ -75,20 +75,6 @@ export default class TaskAtlasSettingTab extends PluginSettingTab {
       );
 
     new Setting(this.containerEl)
-      .setName("Skip empty checkboxes")
-      .setDesc(
-        "Empty checkboxes (- [ ]) will not be carried over to today's note.",
-      )
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.removeEmptyTasks || false)
-          .onChange((value) => {
-            this.plugin.settings.removeEmptyTasks = value;
-            this.plugin.saveSettings();
-          }),
-      );
-
-    new Setting(this.containerEl)
       .setName("Run automatically on daily note creation")
       .setDesc(
         "Automatically carries tasks forward when a new daily note is created.",

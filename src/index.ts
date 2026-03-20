@@ -115,7 +115,6 @@ export default class TaskAtlasPlugin extends Plugin {
     const {
       templateHeading,
       deleteOnComplete,
-      removeEmptyTasks,
       doneStatusMarkers,
       leadingNewLine,
     } = this.settings;
@@ -161,9 +160,8 @@ export default class TaskAtlasPlugin extends Plugin {
         captured,
         doneMarkers,
       );
-      if (removeEmptyTasks) {
-        todaySectionLines = todaySectionLines.filter((l) => !isEmptyTask(l));
-      }
+      // Always filter out empty checkboxes
+      todaySectionLines = todaySectionLines.filter((l) => !isEmptyTask(l));
       keptCount = todaySectionLines.filter((l) =>
         isIncompleteTask(l, doneMarkers),
       ).length;
