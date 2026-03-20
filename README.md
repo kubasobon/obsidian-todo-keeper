@@ -2,26 +2,23 @@
 
 [![Build](https://github.com/kubasobon/obsidian-task-atlas/actions/workflows/ci.yml/badge.svg)](https://github.com/kubasobon/obsidian-task-atlas/actions/workflows/ci.yml)
 
-> **Requires** the **Daily notes** core plugin (Settings → Core plugins → Daily notes).
+An [Obsidian](https://obsidian.md) plugin that carries incomplete tasks from your previous daily note into today's, preserving headings, sub-headings, and nested tasks.
 
-An [Obsidian](https://obsidian.md) plugin that carries incomplete tasks from your previous daily note into today's. It preserves your heading structure, sub-headings, and nested tasks — not just individual lines.
-
+Requires the **Daily notes** core plugin (Settings → Core plugins → Daily notes).
 
 ## Preview
 
 <!-- TODO: add screenshot or GIF here -->
 
-## How it works
+## What it does
 
-When you run the plugin (automatically or via command), it finds the most recent past daily note and:
+TaskAtlas copies your task section from the previous daily note into today's, then removes any tasks that are fully complete. If you enable "Clean up yesterday's note", it also clears incomplete tasks from yesterday, keeping completed ones as a record.
 
-1. **Copies** the entire task section into today's note.
-2. **Cleans today's note** — removes tasks where every item (and all their children) is complete.
-3. **Cleans yesterday's note** *(if "Clean up yesterday's note" is enabled)* — removes incomplete tasks, but keeps completed ones as a record.
+Tasks and subtasks always travel together. If a parent task is unfinished, all its subtasks come with it, done or not. The plugin also waits a few seconds after a note is created before acting, so it won't conflict with Obsidian Sync if the note is still arriving from another device.
 
-### Example
+## Example
 
-**Yesterday's note** (before):
+**Before** (yesterday's note):
 ```markdown
 ## Tasks
 
@@ -35,7 +32,7 @@ When you run the plugin (automatically or via command), it finds the most recent
 - [ ] Go for a walk
 ```
 
-**Today's note** (after carrying tasks forward):
+**After** (today's note):
 ```markdown
 ## Tasks
 
@@ -48,7 +45,7 @@ When you run the plugin (automatically or via command), it finds the most recent
 - [ ] Go for a walk
 ```
 
-**Yesterday's note** (after carrying tasks forward, with "Clean up yesterday's note" enabled):
+**After** (yesterday's note, with "Clean up yesterday's note" enabled):
 ```markdown
 ## Tasks
 
@@ -58,40 +55,30 @@ When you run the plugin (automatically or via command), it finds the most recent
   - [x] Reply to Alice
 ```
 
-> `Make coffee` is done — removed from today. `Review emails` is incomplete — it moves to today with all its children. In yesterday's note, the parent and its completed child `Reply to Alice` are kept as a record; the incomplete `Reply to Bob` is removed.
+`Make coffee` is fully done, so it stays in yesterday and is dropped from today. `Review emails` is incomplete, so it moves forward with all its subtasks. `Reply to Bob` is removed from yesterday; `Reply to Alice` stays as a record.
 
 ## Installation
 
-Install directly from Obsidian: **Settings → Community plugins → Browse** and search for **TaskAtlas**, or visit the [plugin page](https://obsidian.md/plugins?id=task-atlas).
+Install from Obsidian: **Settings → Community plugins → Browse**, search for **TaskAtlas**, or visit the [plugin page](https://obsidian.md/plugins?id=task-atlas).
 
-Make sure the **Daily notes** core plugin is enabled (Settings → Core plugins → Daily notes) and configured with a notes folder.
+Make sure Daily Notes is enabled (Settings → Core plugins → Daily notes) and configured with a notes folder.
 
 ## Usage
 
-**Automatically:** The plugin runs whenever you create a new daily note.
+The plugin runs automatically when you create a new daily note.
 
-**Manually:** Open the Command Palette (`Cmd/Ctrl+P`) and run **Carry Tasks Forward**.
-
-### Notable features
-
-- **Your note structure is preserved.** Your entire task section is carried forward — sub-headings, notes, and nested tasks included. Only fully completed tasks are removed from today's note.
-
-- **Sync-friendly.** TaskAtlas waits for the note to stop changing before acting, so tasks aren't duplicated if your note is still syncing from another device when you open Obsidian.
-
-- **Subtasks travel with their parent.** An unfinished parent task always brings all its subtasks along — even completed ones. In yesterday's note, those completed subtasks are kept as a record of progress.
-
-- **Requires the Daily Notes core plugin** (Settings → Core plugins → Daily notes). Periodic Notes is not supported.
+To run it manually, open the Command Palette (`Cmd/Ctrl+P`) and run **Carry Tasks Forward**.
 
 ## Settings
 
 | Setting | Description |
 |---|---|
-| **Template heading** | The heading in your daily note template under which tasks will be placed. If set to *None*, tasks are appended to the end of the note. |
-| **Run automatically on daily note creation** | Automatically carries tasks forward when a new daily note is created. Disable if you prefer to trigger it manually. |
-| **Clean up yesterday's note** | After copying to today, removes incomplete tasks from yesterday's note. Completed tasks stay as a record. ⚠️ Destructive — enable with caution. |
+| **Template heading** | Tasks are placed under this heading in today's note. If set to *None*, they are appended to the end. |
+| **Run automatically on daily note creation** | Carries tasks forward whenever a new daily note is created. Turn this off to trigger manually. |
+| **Clean up yesterday's note** | Removes incomplete tasks from yesterday's note after copying them to today. Completed tasks remain. Deleted tasks cannot be recovered. |
 | **Skip empty checkboxes** | Empty checkboxes (`- [ ]`) are not carried over. |
-| **Completed task markers** | Characters treated as "done". Defaults to `xX-`. Add characters like `>?+` to support custom statuses (e.g. from the [Tasks plugin](https://publish.obsidian.md/tasks)). |
-| **Blank line after heading** | Inserts a blank line between the template heading and the first task. |
+| **Completed task markers** | Characters that count as "done". Defaults to `xX-`. Add characters like `>?+` to support custom statuses (e.g. from the [Tasks plugin](https://publish.obsidian.md/tasks)). |
+| **Blank line after heading** | Adds a blank line between the template heading and the first task. |
 
 ## Attribution
 
