@@ -18,7 +18,7 @@ fi
 npm run build
 
 mkdir -p "$PLUGIN_DIR"
-cp main.js manifest.json "$PLUGIN_DIR/"
+cp bin/main.js manifest.json "$PLUGIN_DIR/"
 
 echo "Deployed to $PLUGIN_DIR"
 echo "Reload Obsidian to pick up changes."

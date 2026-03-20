@@ -3,9 +3,8 @@ import { resolve } from 'path';
 
 export default defineConfig({
   build: {
-    // Output main.js in the root directory (where Obsidian expects it)
-    outDir: '.',
-    emptyOutDir: false,
+    outDir: 'bin',
+    emptyOutDir: true,
     minify: true,
     sourcemap: true,
     lib: {
