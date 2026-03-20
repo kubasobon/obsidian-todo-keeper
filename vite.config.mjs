@@ -15,7 +15,8 @@ export default defineConfig({
     },
     rollupOptions: {
       // Mark obsidian as external so it's not bundled
-      external: ['obsidian', 'obsidian-daily-notes-interface'],
+      // (Obsidian provides this at runtime)
+      external: ['obsidian'],
     },
   },
   // Dev server settings
