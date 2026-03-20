@@ -1,6 +1,6 @@
 {
     "name": "obsidian-task-atlas",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "description": "Carries incomplete tasks forward from your previous daily note into today's",
     "main": "main.js",
     "author": "Kuba Soboń",
