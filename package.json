@@ -14,8 +14,7 @@
     "keywords": [
         "obsidian",
         "plugin",
-        "task",
-        "keeper",
+        "tasks",
         "daily-notes"
     ],
     "scripts": {
@@ -25,12 +24,8 @@
         "test:watch": "jest --watch",
         "typecheck": "tsc --noEmit",
         "lint": "eslint src/",
-        "deploy": "sh deploy.sh",
-    },
-    "cspell": {
-        "words": [
-            "tasks"
-        ]
+        "format": "prettier --write src/",
+        "deploy": "sh deploy.sh"
     },
     "devDependencies": {
         "@types/jest": "^29.5.0",
